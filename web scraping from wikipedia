@@ -1,0 +1,98 @@
+# Web Scrapping from Wikipedia 
+
+from bs4 import BeautifulSoup
+import requests
+
+url = "https://en.wikipedia.org/wiki/List_of_largest_companies_by_revenue"
+
+r = requests.get(url)
+
+print(r.status_code)
+
+soup = BeautifulSoup(r.text,"lxml")
+
+print(soup.prettify())
+
+
+trs = soup.find_all("tr")[2:52]
+
+# Extract only the text from each <div> tag without the tags themselves
+for tr in trs:
+    tr_text = tr.get_text(separator=' ', strip=True)
+    tr_text_with_spaces = '  '.join(tr_text.split())
+    print(tr_text_with_spaces)
+
+
+
+specific_row = soup.find("tr")
+if specific_row:
+    row_text = specific_row.get_text(separator=' ', strip=True)
+    row_text_with_spaces = '  '.join(row_text.split())
+    print(row_text_with_spaces)
+
+import pandas as pd
+
+# Sample column names (replace this with your actual column names)
+column_names = [
+    'Rank',
+    'Name',
+    'Industry',
+    'Revenue',
+    'Profit',
+    'Employees',
+    'Headquarters',
+    'Note 1',
+    'State-owned',
+    'Ref'
+]
+
+# Create an empty DataFrame with specified column names
+df = pd.DataFrame(columns=column_names)
+df
+
+trs = soup.find_all("tr")[2:52]
+
+# Extract only the text from each <div> tag without the tags themselves
+for tr in trs:
+    tr_text = tr.get_text(separator=' ', strip=True)
+    tr_text_with_spaces = '  '.join(tr_text.split())
+df.loc[length] = tr_text_with_spaces
+length = len(df)
+
+
+df
+
+ column_data = soup.find_all("tr")
+
+for row in column_data[2:52]:
+    row_data = row.find_all("td")
+    individual_row_data = [data.text.strip() for data in row_data]
+    print(individual_row_data)
+
+import pandas as pd
+
+# Assuming you have an empty list to store row data
+all_rows_data = []
+
+# Loop through your data and add rows to the list
+for row in column_data[2:52]:
+    row_data = row.find_all("td")
+    individual_row_data = [data.text.strip() for data in row_data]
+    all_rows_data.append(individual_row_data)  # Append row data to the list
+
+# Find the maximum length among all rows
+max_row_length = max(len(row) for row in all_rows_data)
+
+# Fill shorter rows with empty strings to make them the same length
+for row in all_rows_data:
+    while len(row) < max_row_length:
+        row.append('')
+
+# Convert the row data to a DataFrame
+final_df = pd.DataFrame(all_rows_data)
+
+# Choose a different file path where you have write permissions
+file_path = r'D:\all data\excel files\c6.csv'
+
+# Save the DataFrame to the chosen file path
+final_df.to_csv(file_path, index=False, header=False)
